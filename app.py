@@ -225,7 +225,7 @@ with tab1:
             "To keep visualization clean and beginner-friendly, we isolate the two petal features: "
             "**petal length (cm)** and **petal width (cm)**. Other features are dropped to simplify."
         )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         st.subheader("Feature Sample Table")
         st.dataframe(df_iris, use_container_width=True, height=270)
@@ -249,7 +249,7 @@ with tab1:
             zorder=3
         )
         st.pyplot(fig)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------- Tab 2: Elbow Method -----------------
 with tab2:
@@ -268,7 +268,7 @@ with tab2:
             "where adding more clusters results in decreasing returns of WCSS reduction. This bend "
             "marks the natural clustering structure."
         )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown('<div class="prof-card">', unsafe_allow_html=True)
         st.subheader("Preprocessing Status")
@@ -277,7 +277,7 @@ with tab2:
             "calculate similarity without magnitude bias."
         )
         st.write(f"**Scaling State:** `{'Scaled (StandardScaler)' if scaling_enabled else 'Raw Data'}`")
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
     with col_el2:
         st.markdown('<div class="prof-card">', unsafe_allow_html=True)
@@ -309,7 +309,7 @@ with tab2:
         ax_elb.legend(facecolor='#1e293b', edgecolor='#334155', labelcolor='#94a3b8')
         ax_elb.set_xticks(k_rng)
         st.pyplot(fig_elb)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------- Tab 3: Clustering Results -----------------
 with tab3:
@@ -364,7 +364,7 @@ with tab3:
         
         ax_cl.legend(facecolor='#1e293b', edgecolor='#334155', labelcolor='#94a3b8')
         st.pyplot(fig_cl)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
     with col_cl2:
         st.markdown('<div class="prof-card">', unsafe_allow_html=True)
@@ -386,7 +386,7 @@ with tab3:
             index=[f"Cluster {i}" for i in range(k_val)]
         )
         st.dataframe(centroids_df, use_container_width=True)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------- Tab 4: Interactive Predictor -----------------
 with tab4:
@@ -404,7 +404,7 @@ with tab4:
         input_length = st.slider("Petal Length (cm)", 1.0, 7.0, 3.5, 0.1)
         input_width = st.slider("Petal Width (cm)", 0.1, 2.5, 1.2, 0.1)
         
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         # Predict logic
         new_sample = np.array([[input_length, input_width]])
@@ -469,7 +469,7 @@ with tab4:
         )
         ax_pr.legend(facecolor='#1e293b', edgecolor='#334155', labelcolor='#94a3b8')
         st.pyplot(fig_pr)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------- Tab 5: Evaluation Bench -----------------
 with tab5:
@@ -505,4 +505,4 @@ with tab5:
                 "creates over-segmented or under-segmented groupings. "
                 "Set $k=3$ in the sidebar to review the natural botanical boundaries!"
             )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
