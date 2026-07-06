@@ -226,14 +226,14 @@ with tab3:
         fig_cl, ax_cl = plt.subplots(figsize=(9, 7))
         
         # Generate custom colors palette
-        cmap = plt.cm.get_cmap('tab10', k_val)
+        colors = ['#1f77b4', '#2ca02c', '#ff7f0e', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
         
         for cluster_id in range(k_val):
             subset = df_iris[df_iris['predicted_cluster'] == cluster_id]
             ax_cl.scatter(
                 subset['petal length (cm)'],
                 subset['petal width (cm)'],
-                color=cmap(cluster_id),
+                color=colors[cluster_id % len(colors)],
                 label=f'Cluster {cluster_id}',
                 edgecolor='k',
                 alpha=0.8,
@@ -317,14 +317,14 @@ with tab4:
         
         # Plot existing clusters and highlight new sample
         fig_pr, ax_pr = plt.subplots(figsize=(8, 6))
-        cmap_pr = plt.cm.get_cmap('tab10', k_val)
+        colors_pr = ['#1f77b4', '#2ca02c', '#ff7f0e', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
         
         for cluster_id in range(k_val):
             subset = df_iris[df_iris['predicted_cluster'] == cluster_id]
             ax_pr.scatter(
                 subset['petal length (cm)'],
                 subset['petal width (cm)'],
-                color=cmap_pr(cluster_id),
+                color=colors_pr[cluster_id % len(colors_pr)],
                 alpha=0.4,
                 s=40
             )
