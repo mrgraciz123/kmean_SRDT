@@ -176,7 +176,7 @@ iris_raw, df_iris = get_iris_data()
 df_features = df_iris[['petal length (cm)', 'petal width (cm)']].copy()
 
 # ----------------- Sidebar Controls -----------------
-st.sidebar.markdown('<div class="sidebar-header">Configurations ⚡</div>', unsafe_allowed_html=True)
+st.sidebar.markdown('<div class="sidebar-header">Configurations ⚡</div>', unsafe_allow_html=True)
 st.sidebar.markdown("Fine-tune model attributes and watch the visualizations react in real-time:")
 
 # Slider for k clusters
@@ -204,8 +204,8 @@ st.sidebar.caption(
 )
 
 # ----------------- Top Header -----------------
-st.markdown('<div class="cyber-title">Iris K-Means Clustering Space</div>', unsafe_allowed_html=True)
-st.markdown('<div class="cyber-subtitle">An immersive, interactive visual sandbox for unsupervised machine learning</div>', unsafe_allowed_html=True)
+st.markdown('<div class="cyber-title">Iris K-Means Clustering Space</div>', unsafe_allow_html=True)
+st.markdown('<div class="cyber-subtitle">An immersive, interactive visual sandbox for unsupervised machine learning</div>', unsafe_allow_html=True)
 
 # ----------------- Preprocessing & K-Means Fitting -----------------
 scaler = StandardScaler()
@@ -234,7 +234,7 @@ with tab1:
     col1, col2 = st.columns([1, 1.2])
     
     with col1:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Unsupervised Data Exploration")
         st.write(
             "In machine learning, exploratory data analysis is crucial. Here we load the famous "
@@ -242,13 +242,13 @@ with tab1:
             "and width features. Clustering petal length and width exposes a strong botanical structure "
             "that the algorithm will attempt to segregate completely blindly."
         )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown("### Raw Feature Table")
         st.dataframe(df_iris, use_container_width=True, height=270)
         
     with col2:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Raw Distribution View")
         
         fig, ax = plt.subplots(figsize=(8, 6))
@@ -266,14 +266,14 @@ with tab1:
             zorder=3
         )
         st.pyplot(fig)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------- Tab 2: The Elbow Search -----------------
 with tab2:
     col_el1, col_el2 = st.columns([1, 1.3])
     
     with col_el1:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("The WCSS & Elbow Logic")
         st.write(
             "K-Means works by minimizing distances. The metric minimized is **Within-Cluster Sum of Squares (WCSS)**, "
@@ -284,9 +284,9 @@ with tab2:
             "The optimal number of clusters resides at this bending point. Beyond it, adding more clusters yields "
             "negligible improvements in error reduction."
         )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Scaling Decision Details")
         st.write(
             "Because K-Means calculates straight-line distances, scaling is highly recommended. "
@@ -294,10 +294,10 @@ with tab2:
             "dominates the cluster configuration. "
         )
         st.caption(f"**Current preprocessing standardizing state:** `{scaling_enabled}`")
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
     with col_el2:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         # Calculate WCSS/Inertia for k in 1..10
         wcss = []
         k_rng = range(1, 11)
@@ -326,14 +326,14 @@ with tab2:
         ax_elb.legend(facecolor='#07080f', edgecolor='#1e2030', labelcolor='#8f9cae')
         ax_elb.set_xticks(k_rng)
         st.pyplot(fig_elb)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------- Tab 3: Neon Clusters -----------------
 with tab3:
     col_cl1, col_cl2 = st.columns([1.6, 1])
     
     with col_cl1:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         # Plot clusters and centroids
         fig_cl, ax_cl = plt.subplots(figsize=(9, 7))
         apply_dark_theme(
@@ -382,10 +382,10 @@ with tab3:
         
         ax_cl.legend(facecolor='#07080f', edgecolor='#1e2030', labelcolor='#8f9cae')
         st.pyplot(fig_cl)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
     with col_cl2:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Model Status")
         
         col_m1, col_m2 = st.columns(2)
@@ -404,7 +404,7 @@ with tab3:
             index=[f"Cluster {i}" for i in range(k_val)]
         )
         st.dataframe(centroids_df, use_container_width=True)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------- Tab 4: Spatial Predictor -----------------
 with tab4:
@@ -417,13 +417,13 @@ with tab4:
     col_pr1, col_pr2 = st.columns([1, 1.4])
     
     with col_pr1:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Configure Sample Dimensions")
         
         input_length = st.slider("Input Petal Length (cm)", 1.0, 7.0, 3.5, 0.1)
         input_width = st.slider("Input Petal Width (cm)", 0.1, 2.5, 1.2, 0.1)
         
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         # Predict logic
         new_sample = np.array([[input_length, input_width]])
@@ -440,11 +440,11 @@ with tab4:
             f'<h2>CLUSTER {predicted_c}</h2>'
             f'<span>Nearest centroid distance updated</span>'
             f'</div>',
-            unsafe_allowed_html=True
+            unsafe_allow_html=True
         )
         
     with col_pr2:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Input Location Mapping")
         
         fig_pr, ax_pr = plt.subplots(figsize=(8, 6))
@@ -488,7 +488,7 @@ with tab4:
         )
         ax_pr.legend(facecolor='#07080f', edgecolor='#1e2030', labelcolor='#8f9cae')
         st.pyplot(fig_pr)
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------- Tab 5: Evaluation Bench -----------------
 with tab5:
@@ -506,7 +506,7 @@ with tab5:
         st.dataframe(crosstab_df, use_container_width=True)
         
     with col_ev2:
-        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Partition Evaluation Details")
         
         if k_val == 3:
@@ -526,4 +526,4 @@ with tab5:
                 "This serves as a visual example of over-clustering or under-clustering. "
                 "Set $k=3$ to inspect true biological mapping!"
             )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
