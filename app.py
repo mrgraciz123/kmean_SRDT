@@ -53,7 +53,7 @@ st.markdown("""
         margin-bottom: 1rem;
     }
 </style>
-""", unsafe_allowed_html=True)
+""", unsafe_allow_html=True)
 
 # ----------------- Data Loading -----------------
 @st.cache_data
@@ -68,7 +68,7 @@ iris_raw, df_iris = get_iris_data()
 df_features = df_iris[['petal length (cm)', 'petal width (cm)']].copy()
 
 # ----------------- Sidebar Controls -----------------
-st.sidebar.markdown('<div class="sidebar-header">Configuration ⚙️</div>', unsafe_allowed_html=True)
+st.sidebar.markdown('<div class="sidebar-header">Configuration ⚙️</div>', unsafe_allow_html=True)
 st.sidebar.markdown("Configure the K-Means parameters below:")
 
 # Slider for number of clusters (K)
@@ -98,8 +98,8 @@ st.sidebar.info(
 )
 
 # ----------------- Page Header -----------------
-st.markdown('<div class="main-title">Iris Petal Clustering Dashboard</div>', unsafe_allowed_html=True)
-st.markdown('<div class="subtitle">An interactive visual guide to unsupervised machine learning using K-Means</div>', unsafe_allowed_html=True)
+st.markdown('<div class="main-title">Iris Petal Clustering Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">An interactive visual guide to unsupervised machine learning using K-Means</div>', unsafe_allow_html=True)
 
 # ----------------- Preprocessing & Fitting -----------------
 # Scaler initialization
@@ -130,7 +130,7 @@ with tab1:
     col1, col2 = st.columns([1, 1])
     
     with col1:
-        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("Explore the Iris Dataset")
         st.write(
             "The Iris flower dataset contains 150 samples from three species of Iris "
@@ -141,7 +141,7 @@ with tab1:
             "For this exercise, we focus strictly on the **petal length** and **petal width** features to simplify "
             "cluster visualization."
         )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         st.subheader("Raw Dataset View")
         st.dataframe(df_iris, use_container_width=True, height=250)
@@ -168,7 +168,7 @@ with tab2:
     col_el1, col_el2 = st.columns([1, 1.2])
     
     with col_el1:
-        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("What is the Elbow Method?")
         st.write(
             "The Elbow Method is a heuristic used to find the optimal number of clusters in a dataset. "
@@ -179,9 +179,9 @@ with tab2:
             "As $k$ increases, WCSS naturally decreases (reaching 0 when $k$ equals the number of samples). "
             "We look for an **elbow point**—a point where the rate of WCSS decrease slows down dramatically."
         )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
-        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("Feature Scaling Impact")
         st.write(
             "Feature scaling ensures variables with different magnitudes contribute equally to distances. "
@@ -189,7 +189,7 @@ with tab2:
             "necessary here, but it is highly recommended as a standard preprocessing step."
         )
         st.write(f"**Scaling Enabled:** `{scaling_enabled}`")
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
     with col_el2:
         # Calculate WCSS/Inertia for k in 1..10
@@ -268,11 +268,11 @@ with tab3:
         st.pyplot(fig_cl)
         
     with col_cl2:
-        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("Model Summary")
         st.metric("Total Iterations", kmeans_model.n_iter_)
         st.metric("Final Inertia (WCSS)", f"{kmeans_model.inertia_:.4f}")
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         st.subheader("Cluster Centroid Coordinates")
         centroids_df = pd.DataFrame(
@@ -294,13 +294,13 @@ with tab4:
     col_pr1, col_pr2 = st.columns([1, 1.2])
     
     with col_pr1:
-        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("Input Petal Features")
         
         input_length = st.slider("Petal Length (cm)", 1.0, 7.0, 3.5, 0.1)
         input_width = st.slider("Petal Width (cm)", 0.1, 2.5, 1.2, 0.1)
         
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         # Perform prediction
         new_sample = np.array([[input_length, input_width]])
@@ -375,7 +375,7 @@ with tab5:
         st.dataframe(crosstab_df, use_container_width=True)
         
     with col_ev2:
-        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("Evaluation Summary")
         
         # Analyze and provide qualitative feedback based on chosen k
@@ -393,4 +393,4 @@ with tab5:
                 f"Using $k={k_val}$ clusters over-segments or under-segments the dataset, resulting in "
                 "poor alignment with biological groups. Check out the Elbow Plot in Tab 2 to see why $k=3$ is optimal!"
             )
-        st.markdown('</div>', unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
