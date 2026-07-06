@@ -8,52 +8,160 @@ from sklearn.preprocessing import StandardScaler
 
 # Set page configuration for a wider, modern layout
 st.set_page_config(
-    page_title="Iris K-Means Clustering Dashboard",
+    page_title="Iris K-Means Clustering Space",
     page_icon="🌸",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Inject custom CSS for premium styling, modern fonts, and card containers
+# ----------------- Visual Styles (Custom Dark / Glassmorphic CSS) -----------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
     
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
+    /* Override font family and global backgrounds */
+    html, body, [class*="css"], .stApp {
+        font-family: 'Space Grotesk', -apple-system, sans-serif;
+        background: radial-gradient(circle at 30% 20%, #151624 0%, #07080f 100%) !important;
+        color: #e0e4ec !important;
     }
     
-    .main-title {
-        font-size: 2.8rem;
+    /* Sidebar customization */
+    section[data-testid="stSidebar"] {
+        background-color: #0b0c14 !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Top banner and titles */
+    .cyber-title {
+        font-size: 3.2rem;
         font-weight: 700;
-        background: linear-gradient(90deg, #FF4B4B, #FF8F8F);
+        background: linear-gradient(135deg, #ff007f 0%, #7000ff 50%, #00f0ff 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.2rem;
+        filter: drop-shadow(0px 0px 30px rgba(112, 0, 255, 0.35));
     }
     
-    .subtitle {
-        font-size: 1.1rem;
-        color: #555555;
-        margin-bottom: 2rem;
+    .cyber-subtitle {
+        font-size: 1.25rem;
+        color: #8c9bb4;
+        font-weight: 300;
+        margin-bottom: 2.2rem;
+        letter-spacing: 0.5px;
     }
     
-    .card {
-        background-color: #f9f9fb;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid #eef0f5;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-        margin-bottom: 1.5rem;
+    /* Neon glowing card style */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 255, 255, 0.07) !important;
+        border-radius: 18px !important;
+        padding: 1.75rem !important;
+        backdrop-filter: blur(20px) !important;
+        box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6) !important;
+        margin-bottom: 1.5rem !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .glass-card:hover {
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        box-shadow: 0 12px 40px 0 rgba(0, 240, 255, 0.15) !important;
+        transform: translateY(-2px);
     }
     
+    /* Custom tab headers styling override */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: transparent;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background-color: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px 8px 0 0;
+        padding: 10px 20px;
+        color: #8c9bb4;
+        transition: all 0.25s ease;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: rgba(112, 0, 255, 0.15) !important;
+        border: 1px solid #7000ff !important;
+        color: #00f0ff !important;
+    }
+    
+    /* Sidebar header */
     .sidebar-header {
-        font-weight: 600;
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
+        font-weight: 700;
+        font-size: 1.35rem;
+        background: linear-gradient(135deg, #00f0ff, #7000ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1.25rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Prediction output card */
+    .prediction-box {
+        text-align: center;
+        padding: 2.25rem;
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(255, 0, 127, 0.12) 0%, rgba(112, 0, 255, 0.12) 100%);
+        border: 2px dashed #ff007f;
+        box-shadow: 0 0 35px rgba(255, 0, 127, 0.25);
+        color: #ffffff;
+        margin-top: 1.5rem;
+        transition: all 0.4s ease;
+    }
+    .prediction-box h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        color: #ff007f;
+        text-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+    }
+    
+    /* Floating animations */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(0, 240, 255, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
     }
 </style>
 """, unsafe_allow_html=True)
+
+# ----------------- Matplotlib Dark Theme Helper -----------------
+def apply_dark_theme(fig, ax, title_text="", xlabel="", ylabel=""):
+    fig.patch.set_facecolor('#07080f')
+    ax.set_facecolor('#07080f')
+    
+    # Border spines customization
+    for spine in ax.spines.values():
+        spine.set_color('#1e2030')
+        spine.set_linewidth(1.2)
+        
+    ax.tick_params(colors='#8f9cae', which='both', labelsize=10)
+    ax.xaxis.label.set_color('#8f9cae')
+    ax.yaxis.label.set_color('#8f9cae')
+    ax.xaxis.label.set_size(11)
+    ax.yaxis.label.set_size(11)
+    
+    ax.set_title(title_text, color='#00f0ff', fontsize=14, pad=15, fontweight='bold')
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.grid(True, color='#171926', linestyle=':', alpha=0.7)
+
+# Neon colors list for clustering
+NEON_COLORS = [
+    '#00f0ff',  # Cyber Cyan
+    '#ff007f',  # Neon Orchid Pink
+    '#7000ff',  # Electric Violet
+    '#ffaa00',  # Electric Gold
+    '#00ff66',  # Neon Mint Green
+    '#ff3300',  # Neon Flame Red
+    '#ffff00',  # Radioactive Yellow
+    '#ff00ff',  # Acid Fuchsia
+    '#00ffff',  # Aqua Marine
+    '#ffffff'   # Vaporwave White
+]
 
 # ----------------- Data Loading -----------------
 @st.cache_data
@@ -68,41 +176,38 @@ iris_raw, df_iris = get_iris_data()
 df_features = df_iris[['petal length (cm)', 'petal width (cm)']].copy()
 
 # ----------------- Sidebar Controls -----------------
-st.sidebar.markdown('<div class="sidebar-header">Configuration ⚙️</div>', unsafe_allow_html=True)
-st.sidebar.markdown("Configure the K-Means parameters below:")
+st.sidebar.markdown('<div class="sidebar-header">Configurations ⚡</div>', unsafe_allowed_html=True)
+st.sidebar.markdown("Fine-tune model attributes and watch the visualizations react in real-time:")
 
-# Slider for number of clusters (K)
+# Slider for k clusters
 k_val = st.sidebar.slider(
-    "Number of Clusters (k)",
+    "Clusters count (k)",
     min_value=1,
     max_value=10,
     value=3,
     step=1,
-    help="Select the value of k for training the K-Means algorithm."
+    help="Select the value of k for partition clustering."
 )
 
-# Toggle to enable/disable feature scaling
+# Scaling Toggle
 scaling_enabled = st.sidebar.checkbox(
-    "Enable Feature Scaling",
+    "Standardize Features (StandardScaler)",
     value=True,
-    help="Scale the features to mean=0 and std=1 before clustering."
+    help="Highly recommended for distance-sensitive algorithms like K-Means."
 )
 
-# Quick info in the sidebar
 st.sidebar.markdown("---")
-st.sidebar.info(
-    "**About this App:**\n\n"
-    "This app demonstrates K-Means clustering using "
-    "petal features of the famous Iris dataset. "
-    "Unsupervised models ignore labels and group samples based on similarity."
+st.sidebar.markdown("### Interactive Engine")
+st.sidebar.caption(
+    "Standardizing transforms features to have zero mean and unit variance. "
+    "K-Means computes Euclidean distance, making scaling essential when features use different metrics."
 )
 
-# ----------------- Page Header -----------------
-st.markdown('<div class="main-title">Iris Petal Clustering Dashboard</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">An interactive visual guide to unsupervised machine learning using K-Means</div>', unsafe_allow_html=True)
+# ----------------- Top Header -----------------
+st.markdown('<div class="cyber-title">Iris K-Means Clustering Space</div>', unsafe_allowed_html=True)
+st.markdown('<div class="cyber-subtitle">An immersive, interactive visual sandbox for unsupervised machine learning</div>', unsafe_allowed_html=True)
 
-# ----------------- Preprocessing & Fitting -----------------
-# Scaler initialization
+# ----------------- Preprocessing & K-Means Fitting -----------------
 scaler = StandardScaler()
 if scaling_enabled:
     scaled_data = scaler.fit_transform(df_features)
@@ -111,87 +216,88 @@ if scaling_enabled:
 else:
     training_data = df_features
 
-# Fit the K-Means model for the chosen k
 kmeans_model = KMeans(n_clusters=k_val, random_state=42, n_init='auto')
 cluster_labels = kmeans_model.fit_predict(training_data)
 df_iris['predicted_cluster'] = cluster_labels
 
-# ----------------- Layout Tabs -----------------
+# ----------------- Dashboard Layout (Tabs) -----------------
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📊 Data Exploration", 
-    "📐 Elbow Method", 
-    "🎨 K-Means Clustering", 
-    "🔮 Cluster Predictor",
-    "📋 Evaluation Matrix"
+    "📊 Dataset Exploration",
+    "📐 The Elbow Search",
+    "🎨 Neon Clusters",
+    "🔮 Spatial Predictor",
+    "📋 Evaluation Bench"
 ])
 
-# ----------------- Tab 1: Data Exploration -----------------
+# ----------------- Tab 1: Dataset Exploration -----------------
 with tab1:
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns([1, 1.2])
     
     with col1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Explore the Iris Dataset")
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.subheader("Unsupervised Data Exploration")
         st.write(
-            "The Iris flower dataset contains 150 samples from three species of Iris "
-            "(Iris setosa, Iris virginica, and Iris versicolor). Four features were "
-            "measured from each sample: the length and the width of the sepals and petals."
+            "In machine learning, exploratory data analysis is crucial. Here we load the famous "
+            "**Iris Flower Dataset**. While it contains four measurements, we drop the sepal length "
+            "and width features. Clustering petal length and width exposes a strong botanical structure "
+            "that the algorithm will attempt to segregate completely blindly."
         )
-        st.write(
-            "For this exercise, we focus strictly on the **petal length** and **petal width** features to simplify "
-            "cluster visualization."
-        )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
         
-        st.subheader("Raw Dataset View")
-        st.dataframe(df_iris, use_container_width=True, height=250)
+        st.markdown("### Raw Feature Table")
+        st.dataframe(df_iris, use_container_width=True, height=270)
         
     with col2:
-        st.subheader("Petal Features Distribution (Raw)")
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.subheader("Raw Distribution View")
+        
         fig, ax = plt.subplots(figsize=(8, 6))
+        apply_dark_theme(fig, ax, "Petal Dimensions Scatter", "Petal Length (cm)", "Petal Width (cm)")
+        
+        # Plot original unclustered data with soft cyber glowing color
         ax.scatter(
             df_iris['petal length (cm)'],
             df_iris['petal width (cm)'],
-            color='#8c96c6',
-            edgecolor='k',
-            alpha=0.8,
-            s=60
+            color='#8b9bb4',
+            edgecolor='#e0e4ec',
+            alpha=0.6,
+            s=80,
+            linewidth=0.8,
+            zorder=3
         )
-        ax.set_title("Petal Length vs. Petal Width")
-        ax.set_xlabel("Petal Length (cm)")
-        ax.set_ylabel("Petal Width (cm)")
-        ax.grid(True, linestyle='--', alpha=0.5)
         st.pyplot(fig)
+        st.markdown('</div>', unsafe_allowed_html=True)
 
-# ----------------- Tab 2: Elbow Method -----------------
+# ----------------- Tab 2: The Elbow Search -----------------
 with tab2:
-    col_el1, col_el2 = st.columns([1, 1.2])
+    col_el1, col_el2 = st.columns([1, 1.3])
     
     with col_el1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("What is the Elbow Method?")
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.subheader("The WCSS & Elbow Logic")
         st.write(
-            "The Elbow Method is a heuristic used to find the optimal number of clusters in a dataset. "
-            "It plots the Within-Cluster Sum of Squares (WCSS / Inertia) against the number of clusters $k$."
+            "K-Means works by minimizing distances. The metric minimized is **Within-Cluster Sum of Squares (WCSS)**, "
+            "also known as **Inertia**. A lower inertia implies tight, cohesive clusters."
         )
         st.write(
-            "The **WCSS** measures the sum of squared distances between each point and its assigned cluster centroid. "
-            "As $k$ increases, WCSS naturally decreases (reaching 0 when $k$ equals the number of samples). "
-            "We look for an **elbow point**—a point where the rate of WCSS decrease slows down dramatically."
+            "By plotting WCSS against the number of clusters $k$, we observe an **Elbow**. "
+            "The optimal number of clusters resides at this bending point. Beyond it, adding more clusters yields "
+            "negligible improvements in error reduction."
         )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
         
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Feature Scaling Impact")
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.subheader("Scaling Decision Details")
         st.write(
-            "Feature scaling ensures variables with different magnitudes contribute equally to distances. "
-            "Since petal length and width are both in centimeters with similar ranges, scaling is not strictly "
-            "necessary here, but it is highly recommended as a standard preprocessing step."
+            "Because K-Means calculates straight-line distances, scaling is highly recommended. "
+            "If your features have significantly different scales, the feature with the largest scale "
+            "dominates the cluster configuration. "
         )
-        st.write(f"**Scaling Enabled:** `{scaling_enabled}`")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.caption(f"**Current preprocessing standardizing state:** `{scaling_enabled}`")
+        st.markdown('</div>', unsafe_allowed_html=True)
         
     with col_el2:
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
         # Calculate WCSS/Inertia for k in 1..10
         wcss = []
         k_rng = range(1, 11)
@@ -200,44 +306,57 @@ with tab2:
             km_temp.fit(training_data)
             wcss.append(km_temp.inertia_)
             
-        st.subheader("Elbow Curve (WCSS vs. k)")
         fig_elb, ax_elb = plt.subplots(figsize=(8, 5))
-        ax_elb.plot(k_rng, wcss, marker='o', linestyle='-', color='#1f77b4', linewidth=2, label="WCSS")
+        apply_dark_theme(fig_elb, ax_elb, "Inertia (WCSS) vs Number of Clusters", "Clusters (k)", "Inertia (WCSS)")
         
-        # Highlight current K
-        ax_elb.scatter(k_val, wcss[k_val - 1], color='red', s=150, zorder=5, label=f"Selected k={k_val}")
+        # Plot elbow line
+        ax_elb.plot(k_rng, wcss, marker='o', linestyle='-', color='#00f0ff', linewidth=2.5, markersize=7, zorder=3)
         
-        ax_elb.set_title("WCSS / Inertia across k Values")
-        ax_elb.set_xlabel("Number of Clusters (k)")
-        ax_elb.set_ylabel("Inertia (WCSS)")
+        # Highlight selected k value
+        ax_elb.scatter(
+            k_val,
+            wcss[k_val - 1],
+            color='#ff007f',
+            s=220,
+            edgecolor='#ffffff',
+            linewidths=2.0,
+            zorder=6,
+            label=f"Selected k = {k_val}"
+        )
+        ax_elb.legend(facecolor='#07080f', edgecolor='#1e2030', labelcolor='#8f9cae')
         ax_elb.set_xticks(k_rng)
-        ax_elb.grid(True, linestyle='--', alpha=0.5)
-        ax_elb.legend()
         st.pyplot(fig_elb)
+        st.markdown('</div>', unsafe_allowed_html=True)
 
-# ----------------- Tab 3: K-Means Clustering -----------------
+# ----------------- Tab 3: Neon Clusters -----------------
 with tab3:
-    col_cl1, col_cl2 = st.columns([1.5, 1])
+    col_cl1, col_cl2 = st.columns([1.6, 1])
     
     with col_cl1:
-        st.subheader(f"K-Means Clustering Visual (k = {k_val})")
-        
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
         # Plot clusters and centroids
         fig_cl, ax_cl = plt.subplots(figsize=(9, 7))
+        apply_dark_theme(
+            fig_cl, 
+            ax_cl, 
+            f"Partition Results (k = {k_val} clusters)", 
+            "Petal Length (cm)", 
+            "Petal Width (cm)"
+        )
         
-        # Generate custom colors palette
-        colors = ['#1f77b4', '#2ca02c', '#ff7f0e', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
-        
+        # Draw clusters
         for cluster_id in range(k_val):
             subset = df_iris[df_iris['predicted_cluster'] == cluster_id]
             ax_cl.scatter(
                 subset['petal length (cm)'],
                 subset['petal width (cm)'],
-                color=colors[cluster_id % len(colors)],
+                color=NEON_COLORS[cluster_id % len(NEON_COLORS)],
                 label=f'Cluster {cluster_id}',
-                edgecolor='k',
-                alpha=0.8,
-                s=60
+                edgecolor='#07080f',
+                alpha=0.85,
+                s=80,
+                linewidth=0.8,
+                zorder=4
             )
             
         # Centroids logic
@@ -248,61 +367,65 @@ with tab3:
         else:
             original_centroids = centroids
             
+        # Draw centroids as glowing neon target crosshairs
         ax_cl.scatter(
             original_centroids[:, 0],
             original_centroids[:, 1],
-            color='red',
+            color='#ffffff',
             marker='X',
-            s=250,
-            edgecolor='k',
-            linewidths=1.5,
+            s=280,
+            edgecolor='#ff007f',
+            linewidths=2.5,
             label='Centroids',
             zorder=10
         )
         
-        ax_cl.set_title("Clustered Petal Features with Centroids")
-        ax_cl.set_xlabel("Petal Length (cm)")
-        ax_cl.set_ylabel("Petal Width (cm)")
-        ax_cl.legend()
-        ax_cl.grid(True, linestyle='--', alpha=0.5)
+        ax_cl.legend(facecolor='#07080f', edgecolor='#1e2030', labelcolor='#8f9cae')
         st.pyplot(fig_cl)
+        st.markdown('</div>', unsafe_allowed_html=True)
         
     with col_cl2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Model Summary")
-        st.metric("Total Iterations", kmeans_model.n_iter_)
-        st.metric("Final Inertia (WCSS)", f"{kmeans_model.inertia_:.4f}")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.subheader("Model Status")
         
-        st.subheader("Cluster Centroid Coordinates")
+        col_m1, col_m2 = st.columns(2)
+        with col_m1:
+            st.metric("Iterations", kmeans_model.n_iter_)
+        with col_m2:
+            st.metric("Total WCSS", f"{kmeans_model.inertia_:.3f}")
+            
+        st.write("---")
+        st.markdown("### Cluster Centroids Table")
+        st.caption("Coordinates represent the geometric centers of the clusters in terms of raw centimeters.")
+        
         centroids_df = pd.DataFrame(
             original_centroids,
             columns=['Petal Length (cm)', 'Petal Width (cm)'],
             index=[f"Cluster {i}" for i in range(k_val)]
         )
         st.dataframe(centroids_df, use_container_width=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
 
-# ----------------- Tab 4: Cluster Predictor -----------------
+# ----------------- Tab 4: Spatial Predictor -----------------
 with tab4:
-    st.subheader("Interactive Flower Cluster Predictor 🔮")
+    st.subheader("Real-Time Spatial Predictor 🔮")
     st.write(
-        "Move the sliders to define petal length and width features. "
-        "The model will scale the features (if enabled) and predict which cluster "
-        "the new sample falls into."
+        "Move the sliders below to construct a custom flower profile. "
+        "The model will immediately map its location in the space and determine its cluster classification."
     )
     
-    col_pr1, col_pr2 = st.columns([1, 1.2])
+    col_pr1, col_pr2 = st.columns([1, 1.4])
     
     with col_pr1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Input Petal Features")
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.subheader("Configure Sample Dimensions")
         
-        input_length = st.slider("Petal Length (cm)", 1.0, 7.0, 3.5, 0.1)
-        input_width = st.slider("Petal Width (cm)", 0.1, 2.5, 1.2, 0.1)
+        input_length = st.slider("Input Petal Length (cm)", 1.0, 7.0, 3.5, 0.1)
+        input_width = st.slider("Input Petal Width (cm)", 0.1, 2.5, 1.2, 0.1)
         
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
         
-        # Perform prediction
+        # Predict logic
         new_sample = np.array([[input_length, input_width]])
         if scaling_enabled:
             scaled_sample = scaler.transform(new_sample)
@@ -310,34 +433,45 @@ with tab4:
         else:
             predicted_c = kmeans_model.predict(new_sample)[0]
             
-        st.success(f"### Predicted Group: **Cluster {predicted_c}**")
+        # Radiant glowing box displaying result
+        st.markdown(
+            f'<div class="prediction-box">'
+            f'<span>CLASSIFIED INTO</span>'
+            f'<h2>CLUSTER {predicted_c}</h2>'
+            f'<span>Nearest centroid distance updated</span>'
+            f'</div>',
+            unsafe_allowed_html=True
+        )
         
     with col_pr2:
-        st.subheader("New Sample Placement on Plot")
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.subheader("Input Location Mapping")
         
-        # Plot existing clusters and highlight new sample
         fig_pr, ax_pr = plt.subplots(figsize=(8, 6))
-        colors_pr = ['#1f77b4', '#2ca02c', '#ff7f0e', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        apply_dark_theme(fig_pr, ax_pr, "Target Vector Alignment", "Petal Length (cm)", "Petal Width (cm)")
         
+        # Plot clusters with dimmed alpha
         for cluster_id in range(k_val):
             subset = df_iris[df_iris['predicted_cluster'] == cluster_id]
             ax_pr.scatter(
                 subset['petal length (cm)'],
                 subset['petal width (cm)'],
-                color=colors_pr[cluster_id % len(colors_pr)],
-                alpha=0.4,
-                s=40
+                color=NEON_COLORS[cluster_id % len(NEON_COLORS)],
+                alpha=0.3,
+                s=50,
+                zorder=3
             )
             
-        # Draw the new point as a big yellow star
+        # Draw target vector (User input) as a giant glowing star
         ax_pr.scatter(
             input_length,
             input_width,
-            color='yellow',
-            edgecolor='black',
+            color='#ffff00',
+            edgecolor='#ffffff',
             marker='*',
-            s=350,
-            label='New Sample Input',
+            s=400,
+            linewidths=1.5,
+            label='Your Input Sample',
             zorder=12
         )
         
@@ -345,52 +479,51 @@ with tab4:
         ax_pr.scatter(
             original_centroids[:, 0],
             original_centroids[:, 1],
-            color='red',
+            color='#ffffff',
             marker='X',
-            s=120,
-            edgecolor='k',
-            label='Centroids'
+            s=180,
+            edgecolor='#ff007f',
+            label='Centroids',
+            zorder=8
         )
-        
-        ax_pr.set_xlabel("Petal Length (cm)")
-        ax_pr.set_ylabel("Petal Width (cm)")
-        ax_pr.legend()
-        ax_pr.grid(True, linestyle='--', alpha=0.5)
+        ax_pr.legend(facecolor='#07080f', edgecolor='#1e2030', labelcolor='#8f9cae')
         st.pyplot(fig_pr)
+        st.markdown('</div>', unsafe_allowed_html=True)
 
-# ----------------- Tab 5: Evaluation Matrix -----------------
+# ----------------- Tab 5: Evaluation Bench -----------------
 with tab5:
-    st.subheader("Evaluation Matrix vs. Actual Labels")
+    st.subheader("Ground-Truth Verification Bench")
     st.write(
-        "Here, we compare the unsupervised clusters with the actual species targets. "
-        "Note that unsupervised learning algorithms train without target labels. "
-        "This evaluation is strictly to analyze cluster alignment with the natural classes."
+        "Clustering is unsupervised, meaning the model works completely blind to the actual species label. "
+        "Here, we match the cluster partitions against the original biological species to evaluate the quality of grouping."
     )
     
     col_ev1, col_ev2 = st.columns([1.2, 1])
     
     with col_ev1:
-        st.subheader("Cross-Tabulation Matrix")
+        st.markdown("### Alignment Matrix (Cross-Tabulation)")
         crosstab_df = pd.crosstab(df_iris['species'], df_iris['predicted_cluster'])
         st.dataframe(crosstab_df, use_container_width=True)
         
     with col_ev2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Evaluation Summary")
+        st.markdown('<div class="glass-card">', unsafe_allowed_html=True)
+        st.subheader("Partition Evaluation Details")
         
-        # Analyze and provide qualitative feedback based on chosen k
         if k_val == 3:
             st.info(
-                "💡 **Analysis for k = 3:**\n\n"
-                "- **Setosa** is perfectly isolated into a single cluster.\n"
-                "- **Versicolor** and **Virginica** have slight overlaps due to proximity "
-                "in their petal sizes, which closely mirrors the botanical overlapping characteristics."
+                "💡 **Cluster Assessment (k = 3):**\n\n"
+                "- **Setosa** is perfectly separated from the other classes. "
+                "The K-Means algorithm groups it with 100% biological accuracy.\n"
+                "- **Versicolor** and **Virginica** have slightly overlapping petal attributes in nature, "
+                "resulting in a small fraction of samples being clustered across boundaries. "
+                "This is expected and verifies that K-Means successfully extracted the data's true structure!"
             )
         else:
             st.warning(
-                f"💡 **Analysis for k = {k_val}:**\n\n"
-                "The actual dataset consists of exactly **3 natural species** (Setosa, Versicolor, Virginica). "
-                f"Using $k={k_val}$ clusters over-segments or under-segments the dataset, resulting in "
-                "poor alignment with biological groups. Check out the Elbow Plot in Tab 2 to see why $k=3$ is optimal!"
+                f"💡 **Cluster Assessment (k = {k_val}):**\n\n"
+                f"The biological dataset contains exactly **3 natural groups**. "
+                f"Your selected cluster count ($k={k_val}$) divides the data into a different number of boundaries. "
+                "This serves as a visual example of over-clustering or under-clustering. "
+                "Set $k=3$ to inspect true biological mapping!"
             )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
